@@ -133,16 +133,15 @@ var Updater = {
 
       return false
     }
-
+    if(this.setup.body){
+      packageInfo = this.setup.body; 
+    }
     request(
       {
         url: this.setup.api,
         method: 'post',
         json: true,
-        body: this.setup.body || {
-          name: packageInfo.name,
-          current: packageInfo.version
-        },
+        body: packageInfo,
         headers: this.setup.headers || {}
       },
       function (error, res, body) {
