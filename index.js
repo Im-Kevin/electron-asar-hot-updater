@@ -114,14 +114,17 @@ var Updater = {
     if (callback) {
       this.setup.callback = callback
     }
-
+    var packageInfo;
     // Get the current version
     try{
-      var packageInfo = JSON.parse(fs.readFileSync(AppPath + 'package.json'))
+      packageInfo = JSON.parse(fs.readFileSync(AppPath + 'package.json'))
     } catch(e) {
       console.error(e)
     }
 
+    if(this.setup.body){
+      packageInfo = this.setup.body; 
+    }
     this.log(packageInfo.version)
 
     // If the version property not specified
@@ -132,9 +135,6 @@ var Updater = {
       this.end(0)
 
       return false
-    }
-    if(this.setup.body){
-      packageInfo = this.setup.body; 
     }
     request(
       {
