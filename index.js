@@ -159,7 +159,7 @@ var Updater = {
                 return false
               }
               response = { last: body.version }
-              if (semverDiff(packageInfo.version, body.version)) {
+              if (packageInfo.version != body.version) {
                 response.source = body.asar
               }
               if(body.sha1) {
