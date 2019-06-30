@@ -395,7 +395,7 @@ var Updater = {
         )
 
         let executable = process.execPath
-        const { spawn } = require('child_process')
+        const { exec } = require('sudo-prompt')
         if (process.platform === 'win32') {
           Updater.log(
             'Going to start the windows updater:' +
@@ -421,15 +421,11 @@ var Updater = {
 
           // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'})
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
-          spawn('cmd', ['/s', '/c', '"' + winArgs + '"'], {
-            detached: true,
-            windowsVerbatimArguments: true,
-            stdio: 'ignore'
-          })
+          exec(winArgs)
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
-          spawn("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true })
+          exec("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true })
         }
         // "Updater.end()" will trigger a callback, exec app.quit() in the callback.
         Updater.end()
