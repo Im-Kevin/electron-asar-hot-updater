@@ -421,7 +421,7 @@ var Updater = {
 
           // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'})
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
-          exec(winArgs)
+          exec(winArgs,{name:'Update'})
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
