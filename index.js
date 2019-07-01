@@ -7,14 +7,20 @@ const admZip = require('adm-zip')
 const fs = require('fs')
 const crypto = require('crypto')
 const semverDiff = require('semver-diff')
+const path = require('path');
 
 // Yes, it's weird, but we need the trailing slash after the .asar
 // so we can read paths "inside" it, e.g. the package.json, where we look
 // for our current version
 const AppPath = app.getAppPath() + '/'
 const AppPathFolder = AppPath.slice(0, AppPath.indexOf('app.asar'))
+const TempPathFolder = path.join(app.getPath('temp'),app.getName());
+if(!fs.existsSync(TempPathFolder)){
+  fs.mkdirSync(TempPathFolder);
+}
 const AppAsar = AppPath.slice(0, -1)
-const WindowsUpdater = AppPath.slice(0, AppPath.indexOf('resources')) + 'updater.exe'
+
+const WindowsUpdater = path.join(TempPathFolder, '','updater.exe');
 const UPDATE_FILE = 'update.asar'
 const errors = [
   'version_not_specified',
@@ -60,10 +66,14 @@ var Updater = {
    * Init the module
    * */
   init: function (setup) {
+    if(setup.logFile === false){
+      delete setup.logFile;
+    }
     this.setup = Utils._extend(this.setup, setup)
 
     this.log('AppPath: ' + AppPath)
     this.log('AppPathFolder: ' + AppPathFolder)
+    this.log('TempPathFolder: ' + TempPathFolder)
   },
 
   /**
@@ -90,7 +100,7 @@ var Updater = {
       if(this.setup.debug) {
         console.log('%s + %s + %s', AppPathFolder, this.setup.logFile, line)
       }
-      FileSystem.appendFileSync(AppPathFolder + this.setup.logFile, line + '\n')
+      FileSystem.appendFileSync(this.setup.logFile, line + '\r\n')
     }
   },
 
@@ -223,7 +233,7 @@ var Updater = {
           if (error) {
             return console.error('err')
           }
-          var updateFile = AppPathFolder + UPDATE_FILE
+          var updateFile = path.join(TempPathFolder, UPDATE_FILE);
           if (response.headers['content-type'].includes('zip')) {
             Updater.log('ZipFilePath: ' + AppPathFolder)
             try {
@@ -381,7 +391,7 @@ var Updater = {
   // way of replacing it. This should get called after the main Electron
   // process has quit. Win32 calls 'move' and other platforms call 'mv'
   mvOrMove: function (child) {
-    var updateAsar = AppPathFolder + UPDATE_FILE
+    var updateAsar = path.join(TempPathFolder, UPDATE_FILE);
     var appAsar = AppPathFolder + 'app.asar'
     var winArgs = ''
 
