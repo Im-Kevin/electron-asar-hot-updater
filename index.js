@@ -48,6 +48,7 @@ var Updater = {
     requestOptions: {},
     callback: false,
     progresscallback: false,
+    moveCallback: undefined,
     debug: false,
     formatRes: function(res) { return res }
   },
@@ -133,7 +134,7 @@ var Updater = {
     }
 
     if(this.setup.body){
-      packageInfo = this.setup.body; 
+      packageInfo = this.setup.body;
     }
     this.log(packageInfo.version)
 
@@ -431,11 +432,11 @@ var Updater = {
 
           // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'})
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
-          exec(winArgs,{name:'Update'})
+          exec(winArgs,{name:'Update'}, this.setup.moveCallback)
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
-          exec("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true })
+          exec("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true }, this.setup.moveCallback)
         }
         // "Updater.end()" will trigger a callback, exec app.quit() in the callback.
         Updater.end()
