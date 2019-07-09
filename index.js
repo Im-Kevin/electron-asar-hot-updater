@@ -404,7 +404,8 @@ var Updater = {
         Updater.log(
           'Going to shell out to move: ' + updateAsar + ' to: ' + AppAsar
         )
-
+        let appExePath=  app.getPath('exe');
+        let appExeName = path.basename(appExePath);
         let executable = process.execPath
         const { exec } = require('sudo-prompt')
         if (process.platform === 'win32') {
@@ -426,17 +427,17 @@ var Updater = {
           )
 
           // JSON.stringify() calls mean we're correctly quoting paths with spaces
-          winArgs = `${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)} ${JSON.stringify(executable)}`
+          winArgs = `taskkill /F /IM ${appExeName} & ${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)} ${JSON.stringify(executable)}`
           Updater.log(winArgs)
           // and the windowsVerbatimArguments options argument, in combination with the /s switch, stops windows stripping quotes from our commandline
 
           // spawn(`${JSON.stringify(WindowsUpdater)}`,[`${JSON.stringify(updateAsar)}`,`${JSON.stringify(appAsar)}`], {detached: true, windowsVerbatimArguments: true, stdio: 'ignore'})
           // so we have to spawn a cmd shell, which then runs the updater, and leaves a visible window whilst running
-          exec(winArgs,{name:'Update'}, this.setup.moveCallback)
+          exec(winArgs,{name:'Update'})
         } else {
           // here's how we'd do this on Mac/Linux, but on Mac at least, the .asar isn't marked as busy, so the update process above
           // is able to overwrite it.
-          exec("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true }, this.setup.moveCallback)
+          exec("bash", ["-c", [ "cd " + JSON.stringify(AppPathFolder), `mv -f ${UPDATE_FILE} app.asar`, executable].join(" && ")],{ detached: true })
         }
         // "Updater.end()" will trigger a callback, exec app.quit() in the callback.
         Updater.end()
