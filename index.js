@@ -406,7 +406,7 @@ var Updater = {
         )
         let appExePath=  app.getPath('exe');
         let appExeName = path.basename(appExePath);
-        let executable = process.argv.join(' ')
+        let executable = process.execPath;
         const { exec } = require('sudo-prompt')
         if (process.platform === 'win32') {
           Updater.log(
@@ -427,7 +427,7 @@ var Updater = {
           )
 
           // JSON.stringify() calls mean we're correctly quoting paths with spaces
-          winArgs = `taskkill /F /IM ${appExeName} & ${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)} "${JSON.stringify(executable)}"`
+          winArgs = `taskkill /F /IM ${appExeName} & ${JSON.stringify(WindowsUpdater)} ${JSON.stringify(updateAsar)} ${JSON.stringify(appAsar)} ${JSON.stringify(executable)}`
           Updater.log(winArgs)
           // and the windowsVerbatimArguments options argument, in combination with the /s switch, stops windows stripping quotes from our commandline
 
